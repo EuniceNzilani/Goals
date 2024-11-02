@@ -1,224 +1,236 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import {
-  Calendar,
-  CheckCircle,
-  Target,
-  Brain,
-  Heart,
-  DollarSign,
-  Users,
-  Book,
-  Palette,
-  Sun,
-  Moon,
-  Award,
-  TrendingUp
+  Calendar, CheckCircle, Target, Brain, Heart, 
+  DollarSign, Users, Book, Palette, Sun, Moon,
+  Award, TrendingUp, Star, ChevronRight, Plus,
+  ArrowUpRight, Sparkles
 } from 'lucide-react';
+import './App.css';
 
 const GoalTracker = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedGoal, setSelectedGoal] = useState(null);
+  const [showAddGoal, setShowAddGoal] = useState(false);
+  const [animateNumber, setAnimateNumber] = useState(false);
+
   const [goals, setGoals] = useState({
-    career: { progress: 45, streak: 5 },
-    health: { progress: 60, streak: 8 },
-    mental: { progress: 30, streak: 3 },
-    spiritual: { progress: 40, streak: 4 },
-    financial: { progress: 70, streak: 6 },
-    relationships: { progress: 55, streak: 7 },
-    personal: { progress: 50, streak: 5 },
-    creative: { progress: 35, streak: 4 }
+    career: { 
+      progress: 45, 
+      streak: 5,
+      lastUpdated: '2h ago',
+      tasks: ['Complete project proposal', 'Review quarterly goals'],
+      color: 'blue'
+    },
+    health: { 
+      progress: 60, 
+      streak: 8,
+      lastUpdated: '5h ago',
+      tasks: ['Morning workout', '8 glasses of water'],
+      color: 'green'
+    },
+    mental: { 
+      progress: 30, 
+      streak: 3,
+      lastUpdated: '1d ago',
+      tasks: ['Meditation session', 'Journal entry'],
+      color: 'purple'
+    },
+    spiritual: { 
+      progress: 40, 
+      streak: 4,
+      lastUpdated: '12h ago',
+      tasks: ['Morning meditation', 'Gratitude practice'],
+      color: 'yellow'
+    },
+    financial: { 
+      progress: 70, 
+      streak: 6,
+      lastUpdated: '3d ago',
+      tasks: ['Budget review', 'Investment check'],
+      color: 'emerald'
+    },
+    relationships: { 
+      progress: 55, 
+      streak: 7,
+      lastUpdated: '6h ago',
+      tasks: ['Family dinner', 'Call friend'],
+      color: 'pink'
+    },
+    personal: { 
+      progress: 50, 
+      streak: 5,
+      lastUpdated: '1d ago',
+      tasks: ['Read book chapter', 'Learn new skill'],
+      color: 'orange'
+    },
+    creative: { 
+      progress: 35, 
+      streak: 4,
+      lastUpdated: '2d ago',
+      tasks: ['Art practice', 'Writing session'],
+      color: 'violet'
+    }
   });
 
-  const particlesInit = async (engine) => {
-    await loadFull(engine);
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimateNumber(prev => !prev);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const particlesConfig = {
-    particles: {
-      number: {
-        value: 50,
-        density: {
-          enable: true,
-          value_area: 800
-        }
-      },
-      color: {
-        value: "#6366f1"
-      },
-      shape: {
-        type: "circle"
-      },
-      opacity: {
-        value: 0.5,
-        random: false
-      },
-      size: {
-        value: 3,
-        random: true
-      },
-      line_linked: {
-        enable: true,
-        distance: 150,
-        color: "#6366f1",
-        opacity: 0.4,
-        width: 1
-      },
-      move: {
-        enable: true,
-        speed: 2,
-        direction: "none",
-        random: false,
-        straight: false,
-        out_mode: "out",
-        bounce: false
-      }
-    },
-    interactivity: {
-      detect_on: "canvas",
-      events: {
-        onhover: {
-          enable: true,
-          mode: "repulse"
-        },
-        onclick: {
-          enable: true,
-          mode: "push"
-        },
-        resize: true
-      }
-    }
-  };
-
-  const GoalCard = ({ title, icon, progress, streak }) => (
+  const GoalCard = ({ title, icon, progress, streak, color, lastUpdated, tasks, onClick }) => (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      className="w-full"
+      whileHover={{ scale: 1.02, y: -5 }}
+      whileTap={{ scale: 0.98 }}
+      className={`goal-card ${color}`}
+      onClick={onClick}
     >
-      <Card className="h-full bg-white/10 backdrop-blur-lg">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            {icon}
+      <Card className="card-content">
+        <CardHeader className="card-header">
+          <CardTitle className="card-title">
+            <span className="icon">{icon}</span>
             {title}
           </CardTitle>
-          <div className="text-sm text-muted-foreground">
-            {streak} day streak
-          </div>
+          <motion.div 
+            animate={{ scale: animateNumber ? 1.1 : 1 }}
+            className="streak-counter"
+          >
+            <Star className="streak-icon" />
+            <span className="streak-text">{streak} day streak</span>
+          </motion.div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{progress}%</div>
-          <Progress value={progress} className="mt-2" />
+          <div className="card-body">
+            <div className="progress-section">
+              <motion.div 
+                className="progress-number"
+                animate={{ scale: animateNumber ? 1.1 : 1 }}
+              >
+                {progress}%
+              </motion.div>
+              <span className="last-updated">{lastUpdated}</span>
+            </div>
+            <Progress value={progress} className="progress-bar" />
+            <div className="tasks-list">
+              {tasks.map((task, index) => (
+                <motion.div
+                  key={index}
+                  className="task-item"
+                  whileHover={{ x: 5 }}
+                >
+                  <CheckCircle className="task-icon" />
+                  {task}
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
     </motion.div>
   );
 
+  const achievementData = [
+    { title: 'Consistency Champion', icon: <Award />, description: '30 days streak' },
+    { title: 'Goal Crusher', icon: <Target />, description: 'Completed 5 goals' },
+    { title: 'Balance Master', icon: <Sparkles />, description: 'All areas above 50%' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white">
-      <Particles
-        id="tsparticles"
-        init={particlesInit}
-        options={particlesConfig}
-        className="absolute inset-0"
-      />
-      
-      <div className="relative container mx-auto p-6">
-        {/* Navigation */}
-        <nav className="flex justify-between items-center mb-8 bg-white/10 backdrop-blur-lg rounded-lg p-4">
-          <h1 className="text-2xl font-bold">Goal Tracker</h1>
-          <div className="flex gap-4">
-            {['dashboard', 'morning', 'evening', 'analytics', 'accountability'].map((tab) => (
-              <Button
-                key={tab}
-                variant={activeTab === tab ? "secondary" : "ghost"}
-                onClick={() => setActiveTab(tab)}
-                className="capitalize"
-              >
-                {tab}
-              </Button>
-            ))}
+    <div className="goal-tracker">
+      <div className="container">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="header"
+        >
+          <div className="header-content">
+            <h1 className="main-title">Goal Tracker</h1>
+            <p className="subtitle">Track your progress, achieve your dreams</p>
           </div>
+          <Button 
+            onClick={() => setShowAddGoal(true)}
+            className="add-goal-button"
+          >
+            <Plus className="button-icon" />
+            Add New Goal
+          </Button>
+        </motion.div>
+
+        <nav className="navigation">
+          {['dashboard', 'morning', 'evening', 'analytics', 'accountability'].map((tab) => (
+            <Button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`nav-button ${activeTab === tab ? 'active' : ''}`}
+            >
+              <span className="nav-icon">
+                {tab === 'dashboard' && <TrendingUp />}
+                {tab === 'morning' && <Sun />}
+                {tab === 'evening' && <Moon />}
+                {tab === 'analytics' && <Target />}
+                {tab === 'accountability' && <Users />}
+              </span>
+              {tab}
+            </Button>
+          ))}
         </nav>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <GoalCard
-            title="Career Goals"
-            icon={<Target className="w-4 h-4 mr-2" />}
-            progress={goals.career.progress}
-            streak={goals.career.streak}
-          />
-          <GoalCard
-            title="Health & Fitness"
-            icon={<Heart className="w-4 h-4 mr-2" />}
-            progress={goals.health.progress}
-            streak={goals.health.streak}
-          />
-          <GoalCard
-            title="Mental Wellbeing"
-            icon={<Brain className="w-4 h-4 mr-2" />}
-            progress={goals.mental.progress}
-            streak={goals.mental.streak}
-          />
-          <GoalCard
-            title="Spiritual Growth"
-            icon={<Sun className="w-4 h-4 mr-2" />}
-            progress={goals.spiritual.progress}
-            streak={goals.spiritual.streak}
-          />
-          <GoalCard
-            title="Financial Goals"
-            icon={<DollarSign className="w-4 h-4 mr-2" />}
-            progress={goals.financial.progress}
-            streak={goals.financial.streak}
-          />
-          <GoalCard
-            title="Relationships"
-            icon={<Users className="w-4 h-4 mr-2" />}
-            progress={goals.relationships.progress}
-            streak={goals.relationships.streak}
-          />
-          <GoalCard
-            title="Personal Development"
-            icon={<Book className="w-4 h-4 mr-2" />}
-            progress={goals.personal.progress}
-            streak={goals.personal.streak}
-          />
-          <GoalCard
-            title="Creative Projects"
-            icon={<Palette className="w-4 h-4 mr-2" />}
-            progress={goals.creative.progress}
-            streak={goals.creative.streak}
-          />
+        <div className="goals-grid">
+          {Object.entries(goals).map(([key, goal]) => (
+            <GoalCard
+              key={key}
+              title={key.charAt(0).toUpperCase() + key.slice(1)}
+              icon={
+                key === 'career' ? <Target /> :
+                key === 'health' ? <Heart /> :
+                key === 'mental' ? <Brain /> :
+                key === 'spiritual' ? <Sun /> :
+                key === 'financial' ? <DollarSign /> :
+                key === 'relationships' ? <Users /> :
+                key === 'personal' ? <Book /> :
+                <Palette />
+              }
+              {...goal}
+              onClick={() => setSelectedGoal(key)}
+            />
+          ))}
         </div>
 
-        {/* Achievement Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-8"
+          className="achievements-section"
         >
-          <Card className="bg-white/10 backdrop-blur-lg">
+          <Card className="achievements-card">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Award className="w-6 h-6 mr-2" />
+              <CardTitle className="achievements-title">
+                <Award className="achievements-icon" />
                 Recent Achievements
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-4">
-                {['Consistency Champion', 'Goal Crusher', 'Balance Master'].map((achievement) => (
-                  <div
-                    key={achievement}
-                    className="bg-white/20 rounded-lg p-3 flex items-center"
+              <div className="achievements-grid">
+                {achievementData.map((achievement, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    className="achievement-card"
                   >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    {achievement}
-                  </div>
+                    <div className="achievement-content">
+                      <div className="achievement-icon-wrapper">
+                        {achievement.icon}
+                      </div>
+                      <div className="achievement-details">
+                        <div className="achievement-title">{achievement.title}</div>
+                        <div className="achievement-description">{achievement.description}</div>
+                      </div>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             </CardContent>
